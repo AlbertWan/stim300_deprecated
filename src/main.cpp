@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <sys/types.h>
+#include <cmath>  // for pow
 #include <Stim300RevD.hpp>
 #include <Stim300RevB.hpp>
 #include <Stim300RevG.hpp>
@@ -20,6 +21,33 @@
 
 
 using namespace std;
+
+
+///////////////
+
+const double averageAllanVarianceOfGyro{5.2120181159657662*pow(10,-4)};
+const double averageAllanVarianceOfAcc{5.1123915528733790*pow(10,-3)};
+const int sampleRate{125};
+
+
+
+double getAllanVarianceToVarianceOfGyro(){
+    double variance{0};
+
+    variance=sampleRate*pow(averageAllanVarianceOfGyro,2);
+
+    return variance;
+}
+
+double getAllanVarianceToVarianceOfAcc(){
+    double variance{0};
+
+    variance=sampleRate*pow(averageAllanVarianceOfAcc,2);
+
+    return variance;
+}
+
+////////////////
 
 /**
 * SIGNAL      ID   DEFAULT  DESCRIPTION
@@ -211,7 +239,7 @@ int main(int argc , char **argv)
     myDriverRevG.welcome();
 
     myDriverRevG.setBaudrate(iodrivers_base::Driver::SERIAL_921600);
-    myDriverRevG.setFrequency(125);
+    myDriverRevG.setFrequency(sampleRate);
     myDriverRevG.setPackageTimeout(0.1);
 
 
@@ -236,7 +264,7 @@ int main(int argc , char **argv)
 
     ros::Publisher imuSensorPublisher = node.advertise<sensor_msgs::Imu>("imu/data_raw", 1000);
 
-    ros::Rate loop_rate(125);
+    ros::Rate loop_rate(sampleRate);
 
     //int i{0};
 
@@ -271,11 +299,24 @@ int main(int argc , char **argv)
             
 		}
 
-      
-        stim300msg.orientation_covariance[0] = -1;
-        stim300msg.angular_velocity_covariance[0] = -1;
-        stim300msg.linear_acceleration_covariance[0] = -1;
+        
+       
+        /* Covariance matrix
+        variance_x² 0 0
+        0 variance_y² 0 
+        0 0 variance_z²
+        */
 
+        stim300msg.orientation_covariance[0] = -1;
+        stim300msg.angular_velocity_covariance[0] = getAllanVarianceToVarianceOfGyro();
+        stim300msg.angular_velocity_covariance[4] = getAllanVarianceToVarianceOfGyro();
+        stim300msg.angular_velocity_covariance[8] = getAllanVarianceToVarianceOfGyro();                                  
+        stim300msg.linear_acceleration_covariance[0] = getAllanVarianceToVarianceOfAcc();
+        stim300msg.linear_acceleration_covariance[4] = getAllanVarianceToVarianceOfAcc();
+        stim300msg.linear_acceleration_covariance[8] = getAllanVarianceToVarianceOfAcc();
+
+
+        //
         // Place sensor data from IMU to message
 
         stim300msg.linear_acceleration.x = myDriverRevG.getAccData()[0];
