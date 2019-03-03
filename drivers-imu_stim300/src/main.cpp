@@ -25,8 +25,8 @@ using namespace std;
 
 ///////////////
 
-const double averageAllanVarianceOfGyro{5.2120181159657662*pow(10,-4)};
-const double averageAllanVarianceOfAcc{5.1123915528733790*pow(10,-3)};
+const double averageAllanVarianceOfGyro{2*4.6*pow(10,-4)};
+const double averageAllanVarianceOfAcc{2*5.2*pow(10,-3)};
 const int sampleRate{125};
 
 
