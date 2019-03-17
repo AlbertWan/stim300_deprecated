@@ -109,7 +109,7 @@ int main(int argc , char **argv)
 
         myDriverRevG.processPacket();
         stim300msg.header.stamp = ros::Time::now();
-        stim300msg.header.frame_id = "imu_frame";
+        stim300msg.header.frame_id = "imu_0";
         differenceInDataGram = myDriverRevG.getDatagramCounterDiff();
 
         
