@@ -23,8 +23,8 @@ using namespace std;
 
 ///////////////
 constexpr int defaultSampleRate{125};
-constexpr double averageAllanVarianceOfGyro{2*4.6*pow(10,-4)};
-constexpr double averageAllanVarianceOfAcc{2*5.2*pow(10,-3)};
+constexpr double averageAllanVarianceOfGyro{100*2*4.6*pow(10,-4)};
+constexpr double averageAllanVarianceOfAcc{100*2*5.2*pow(10,-3)};
 
 
 
@@ -109,7 +109,7 @@ int main(int argc , char **argv)
 
         myDriverRevG.processPacket();
         stim300msg.header.stamp = ros::Time::now();
-        stim300msg.header.frame_id = "imu_frame";
+        stim300msg.header.frame_id = "imu_0";
         differenceInDataGram = myDriverRevG.getDatagramCounterDiff();
 
         
@@ -139,9 +139,9 @@ int main(int argc , char **argv)
             //
             // Place sensor data from IMU to message
 
-            stim300msg.linear_acceleration.x = myDriverRevG.getAccData()[0];
-            stim300msg.linear_acceleration.y = myDriverRevG.getAccData()[1];
-            stim300msg.linear_acceleration.z = myDriverRevG.getAccData()[2];
+            stim300msg.linear_acceleration.x = myDriverRevG.getAccData()[0]+0.0023;
+            stim300msg.linear_acceleration.y = myDriverRevG.getAccData()[1]+0.05;
+            stim300msg.linear_acceleration.z = myDriverRevG.getAccData()[2]+0.027;
 
             stim300msg.angular_velocity.x = myDriverRevG.getGyroData()[0];
             stim300msg.angular_velocity.y = myDriverRevG.getGyroData()[1];
