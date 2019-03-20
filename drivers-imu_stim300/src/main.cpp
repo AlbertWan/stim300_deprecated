@@ -23,7 +23,7 @@ using namespace std;
 
 ///////////////
 constexpr int defaultSampleRate{125};
-constexpr double averageAllanVarianceOfGyro{100*2*4.6*pow(10,-4)};
+constexpr double averageAllanVarianceOfGyro{0.0001*2*4.6*pow(10,-4)};
 constexpr double averageAllanVarianceOfAcc{100*2*5.2*pow(10,-3)};
 
 
