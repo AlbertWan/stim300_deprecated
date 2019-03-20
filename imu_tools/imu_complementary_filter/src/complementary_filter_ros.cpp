@@ -49,7 +49,9 @@ ComplementaryFilterROS::ComplementaryFilterROS(
   int queue_size = 5;
 
   // Register publishers:
-  imu_publisher_ = nh_.advertise<sensor_msgs::Imu>(ros::names::resolve("manta") + "/imu", queue_size);
+
+  imu_publisher_ = nh_.advertise<sensor_msgs::Imu>(ros::names::resolve("imu") + "/ahrs", queue_size);
+
 
   if (publish_debug_topics_)
   {
