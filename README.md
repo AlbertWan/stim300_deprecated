@@ -1,4 +1,4 @@
-# Ros_STIM300
+# STIM300
 ROS package for STIM300 in C++ 
 
 ## Prerequisites
@@ -17,17 +17,18 @@ If the STIM300 is connected to ttyUSB0 do:
 ## Installation
 
     cd ~/catkin_ws/src
-    git clone -b master https://github.com/vortexntnu/stim300
+    git clone https://github.com/vortexntnu/stim300
     cd ~/catkin_ws
     catkin_make  or catkin build drivers-imu_stim300
     
   
 ## Usage
-Run the script using:
+To run the publisher:
 
-    #To run the publisher:
-    rosrun drivers-imu_stim300 /dev/ttyUSB0
-    
+```shell
+rosrun drivers-imu_stim300 /dev/ttyUSB0
+```
+
 ## Documentation
 
 The stim300 driver is based on the github repository from https://github.com/rock-drivers/drivers-imu_stim300. 
