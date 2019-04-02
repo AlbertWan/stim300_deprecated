@@ -32,28 +32,27 @@ Screen and keyboard:
 
     P - Add linefeed
 
-Save setup as dfl
+Save setup as dfl then Exit minicom, and enter again in hex display mode:
 
-Exit Setup
+    sudo minicom -H
 
-The stim300 will send the standard datagram, which will appera as a lot of gipperish.
-In order to enter servicemode you must frist set the terminal emulation to ANSI:
+The stim300 is in normal mode and will reapeatidly send the standard datagram.
 
-    Ctr-a t
-    A - terminal emulation: ANSI
-
-Make sure the Backspace key send stays as BS
 Enter service mode: write "SERVICEMODE" and press enter
 
     SERVICEMODE
 
 Clear the screen:
 
-    Ctr-A c
+    Ctrl-A c
+    
+If the incomming datagram feed stopped it means you enter service mode sucsessfully. While in service mode the stim 300 will comunicate with asci characters. Exit minicom and enter in normal ASCI mode:
 
+    Ctrl-A x
+    sudo minicom
+   
 Write ? and press enter, and the STIM300 should send info about available commands
 
     ?
 
-If minicom dont add linebreak on the output from the stim300, restart minicom.
-To exit Minicom when in terminal mode press 'Ctrl-A' to get a message bar at the bottom of the terminal window and then press 'X'.
+This will show a list on available commands including how to go back to normal mode.
