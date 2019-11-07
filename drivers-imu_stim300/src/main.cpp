@@ -5,6 +5,7 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <cmath>  // for pow
+#include <math.h> // for atan2
 #include <Stim300RevG.hpp>
 
 
@@ -107,7 +108,6 @@ int main(int argc , char **argv)
         
         
         sensor_msgs::Imu stim300msg;
-        cout<<sampleRate<<endl;
 
         myDriverRevG.processPacket();
         stim300msg.header.stamp = ros::Time::now();
@@ -126,7 +126,30 @@ int main(int argc , char **argv)
         }
         else
         {  
+            double roll{0};
+            double pitch{0};
+            double inclinationX{0};
+            double inclinationY{0};
+            double inclinationZ{0};
 
+
+            // Get inclination data and convert to roll and pitch
+
+            inclinationX = double(myDriverRevG.getInclData()[1]);
+            inclinationY = double(myDriverRevG.getInclData()[2]);
+            inclinationZ = double(myDriverRevG.getInclData()[3]);
+
+            cout<<inclinationX<<endl;
+            cout<<inclinationY<<endl;
+            cout<<inclinationZ<<endl;
+
+
+            roll = double(atan2(inclinationY,inclinationZ));
+            pitch = double(atan2(-inclinationX,sqrt(pow(inclinationY,2)+pow(inclinationZ,2)));
+
+
+            cout<<roll<<endl;
+            cout<<pitch<<endl;
             //myDriverRevG.printInfo();
              
             stim300msg.orientation_covariance[0] = -1;
