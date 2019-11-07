@@ -74,7 +74,6 @@ int main(int argc , char **argv)
 
 
     varianceOfGyro=sampleRate*pow(stanardDeivationOfGyro,2);
-
     varianceOfAcc=sampleRate*pow(stanardDeviationOfAcc,2);
     
 
@@ -108,6 +107,7 @@ int main(int argc , char **argv)
         
         
         sensor_msgs::Imu stim300msg;
+        cout<<sampleRate<<endl;
 
         myDriverRevG.processPacket();
         stim300msg.header.stamp = ros::Time::now();
@@ -127,7 +127,7 @@ int main(int argc , char **argv)
         else
         {  
 
-            myDriverRevG.printInfo();
+            //myDriverRevG.printInfo();
              
             stim300msg.orientation_covariance[0] = -1;
             stim300msg.angular_velocity_covariance[0] = varianceOfGyro;
