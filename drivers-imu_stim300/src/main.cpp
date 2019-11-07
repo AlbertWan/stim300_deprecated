@@ -47,7 +47,7 @@ int main(int argc , char **argv)
 	return 0;
     }
 
-    myDriverRevG.printInfo();
+    
 
   
     // ROS PART ---------------------------------------------
@@ -127,7 +127,7 @@ int main(int argc , char **argv)
         else
         {  
 
-            
+            myDriverRevG.printInfo();
              
             stim300msg.orientation_covariance[0] = -1;
             stim300msg.angular_velocity_covariance[0] = varianceOfGyro;
