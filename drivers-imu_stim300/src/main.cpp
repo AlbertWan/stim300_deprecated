@@ -139,9 +139,9 @@ int main(int argc , char **argv)
             //
             // Place sensor data from IMU to message
 
-            stim300msg.linear_acceleration.x = myDriverRevG.getAccData()[0]+0.0023;
-            stim300msg.linear_acceleration.y = myDriverRevG.getAccData()[1]+0.05;
-            stim300msg.linear_acceleration.z = myDriverRevG.getAccData()[2]+0.027;
+            stim300msg.linear_acceleration.x = myDriverRevG.getAccData()[0];
+            stim300msg.linear_acceleration.y = myDriverRevG.getAccData()[1];
+            stim300msg.linear_acceleration.z = myDriverRevG.getAccData()[2];
 
             stim300msg.angular_velocity.x = myDriverRevG.getGyroData()[0];
             stim300msg.angular_velocity.y = myDriverRevG.getGyroData()[1];
