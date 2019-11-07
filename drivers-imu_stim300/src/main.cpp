@@ -135,21 +135,21 @@ int main(int argc , char **argv)
 
             // Get inclination data and convert to roll and pitch
 
-            inclinationX = double(myDriverRevG.getInclData()[1]);
-            inclinationY = double(myDriverRevG.getInclData()[2]);
-            inclinationZ = double(myDriverRevG.getInclData()[3]);
+            inclinationX = myDriverRevG.getInclData()[0];
+            inclinationY = myDriverRevG.getInclData()[1];
+            inclinationZ = myDriverRevG.getInclData()[2];
 
-            cout<<inclinationX<<endl;
-            cout<<inclinationY<<endl;
-            cout<<inclinationZ<<endl;
-
-
-            roll = double(atan2(inclinationY,inclinationZ));
-            pitch = double(atan2(-inclinationX,sqrt(pow(inclinationY,2)+pow(inclinationZ,2)));
+           // cout<<inclinationX<<endl;
+           // cout<<inclinationY<<endl;
+           // cout<<inclinationZ<<endl;
 
 
-            cout<<roll<<endl;
-            cout<<pitch<<endl;
+            roll = atan2(inclinationY,inclinationZ)*(180.0/3.14159265358979323846);
+            pitch = atan2(-inclinationX,sqrt(pow(inclinationY,2)+pow(inclinationZ,2)))*(180.0/3.14159265358979323846);
+
+
+    	    cout<<"roll: "<<roll<<endl;
+            cout<<"pitch: "<<pitch<<endl;
             //myDriverRevG.printInfo();
              
             stim300msg.orientation_covariance[0] = -1;
