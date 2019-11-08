@@ -223,7 +223,7 @@ int main(int argc , char **argv)
 
             RPY.roll = atan2(inclinationY,inclinationZ)*(180.0/PI);
             RPY.pitch = atan2(-inclinationX,sqrt(pow(inclinationY,2)+pow(inclinationZ,2)))*(180.0/PI);
-            RPY.yaw = YawFromEKF.yaw;
+            RPY.yaw = yawFromEKF.yaw;
 
             q = FromRPYToQuaternion(RPY);
 
@@ -232,8 +232,9 @@ int main(int argc , char **argv)
             cout<<"yaw_from_ekf"<< RPY.yaw<<endl;
 
             //myDriverRevG.printInfo();
-             
-            stim300msg.orientation_covariance[0] = -1;
+            stim300msg.orientation_covariance[0] = 0.2; 
+            stim300msg.orientation_covariance[4] = 0.2;
+            stim300msg.orientation_covariance[8] = 0.2;
             stim300msg.angular_velocity_covariance[0] = varianceOfGyro;
             stim300msg.angular_velocity_covariance[4] = varianceOfGyro;
             stim300msg.angular_velocity_covariance[8] = varianceOfGyro;                                  
