@@ -64,10 +64,8 @@ EulerAngles FromQuaternionToEulerAngles(Quaternion q) {
     return angles;
 }
 
-// Global Quaternion
-Quaternion globqat;
 
-void FromRPYToQuaternion(EulerAngles angles) // yaw (Z), pitch (Y), roll (X)
+Quaternion FromRPYToQuaternion(EulerAngles angles) // yaw (Z), pitch (Y), roll (X)
 {
     // Abbreviations for the various angular functions
     double cy = cos(yaw * 0.5);
@@ -77,25 +75,24 @@ void FromRPYToQuaternion(EulerAngles angles) // yaw (Z), pitch (Y), roll (X)
     double cr = cos(roll * 0.5);
     double sr = sin(roll * 0.5);
 
-    
-    globqat.w = cy * cp * cr + sy * sp * sr;
-    globqat.x = cy * cp * sr - sy * sp * cr;
-    globqat.y = sy * cp * sr + cy * sp * cr;
-    globqat.z = sy * cp * cr - cy * sp * sr;
-}
-
-
-
-
-Quaternion quatFromEkfCallback(const sensor_msgs::Imu::ConstPtr& message)
-{
     Quaternion q;
-    q.w = message->orientation.w;
-    q.x = message->orientation.x;
-    q.y = message->orientation.y;
-    q.z = message->orientation.z;
+    q.w = cy * cp * cr + sy * sp * sr;
+    q.x = cy * cp * sr - sy * sp * cr;
+    q.y = sy * cp * sr + cy * sp * cr;
+    q.z = sy * cp * cr - cy * sp * sr;
 
     return q;
+}
+
+// Global Quaternion
+Quaternion globqat;
+
+void quatFromEkfCallback(const sensor_msgs::Imu::ConstPtr& message)
+{
+    globqat.w = message->orientation.w;
+    globqat.x = message->orientation.x;
+    globqat.y = message->orientation.y;
+    globqat.z = message->orientation.z;
 }
 
 
