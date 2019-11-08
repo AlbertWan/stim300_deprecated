@@ -7,7 +7,7 @@
 #include <cmath>  // for pow
 #include <math.h> // for atan2
 #include <Stim300RevG.hpp>
-
+#include <Eigen/Geometry> 
 
 // For ROS to work properly 
 
@@ -26,8 +26,80 @@ using namespace std;
 constexpr int defaultSampleRate{125}; // In hz
 constexpr double averageAllanVarianceOfGyro{0.0001*2*4.6*pow(10,-4)};
 constexpr double averageAllanVarianceOfAcc{100*2*5.2*pow(10,-3)};
+constexpr double PI{3.14159265358979323846};
 
 
+
+
+/////////////// - inclinometer code
+struct Quaternion
+{
+    double w, x, y, z;
+};
+
+struct EulerAngles {
+    double roll, pitch, yaw;
+};
+
+EulerAngles FromQuaternionToEulerAngles(Quaternion q) {
+    EulerAngles angles;
+
+    // roll (x-axis rotation)
+    double sinr_cosp = 2 * (q.w * q.x + q.y * q.z);
+    double cosr_cosp = 1 - 2 * (q.x * q.x + q.y * q.y);
+    angles.roll = std::atan2(sinr_cosp, cosr_cosp);
+
+    // pitch (y-axis rotation)
+    double sinp = 2 * (q.w * q.y - q.z * q.x);
+    if (std::abs(sinp) >= 1)
+        angles.pitch = std::copysign(M_PI / 2, sinp); // use 90 degrees if out of range
+    else
+        angles.pitch = std::asin(sinp);
+
+    // yaw (z-axis rotation)
+    double siny_cosp = 2 * (q.w * q.z + q.x * q.y);
+    double cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z);
+    angles.yaw = std::atan2(siny_cosp, cosy_cosp);
+
+    return angles;
+}
+
+// Global Quaternion
+Quaternion globqat;
+
+void FromRPYToQuaternion(EulerAngles angles) // yaw (Z), pitch (Y), roll (X)
+{
+    // Abbreviations for the various angular functions
+    double cy = cos(yaw * 0.5);
+    double sy = sin(yaw * 0.5);
+    double cp = cos(pitch * 0.5);
+    double sp = sin(pitch * 0.5);
+    double cr = cos(roll * 0.5);
+    double sr = sin(roll * 0.5);
+
+    
+    globqat.w = cy * cp * cr + sy * sp * sr;
+    globqat.x = cy * cp * sr - sy * sp * cr;
+    globqat.y = sy * cp * sr + cy * sp * cr;
+    globqat.z = sy * cp * cr - cy * sp * sr;
+}
+
+
+
+
+Quaternion quatFromEkfCallback(const sensor_msgs::Imu::ConstPtr& message)
+{
+    Quaternion q;
+    q.w = message->orientation.w;
+    q.x = message->orientation.x;
+    q.y = message->orientation.y;
+    q.z = message->orientation.z;
+
+    return q;
+}
+
+
+/////// - inclinometer code 
 
 
 
@@ -94,11 +166,13 @@ int main(int argc , char **argv)
     }
     usleep(98000);
 
+    // Inclinometer -- 
+
+    ros::Subscriber EKFsubscriber = node.subscribe("quat/ekf",1000,quatFromEkfCallback);
+
+    // inclinometer  -- 
     ros::Publisher imuSensorPublisher = node.advertise<sensor_msgs::Imu>("imu/data_raw", 1000);
-
     ros::Rate loop_rate(sampleRate+1);
-
-    //int i{0};
 
     int differenceInDataGram{0};
     int countMessages{0};
@@ -126,11 +200,15 @@ int main(int argc , char **argv)
         }
         else
         {  
-            double roll{0};
-            double pitch{0};
+            
             double inclinationX{0};
             double inclinationY{0};
             double inclinationZ{0};
+            Quaternion q;
+            EulerAngles RPY;
+            EulerAngles yawFromEKF;
+
+            
 
 
             // Get inclination data and convert to roll and pitch
@@ -143,13 +221,19 @@ int main(int argc , char **argv)
            // cout<<inclinationY<<endl;
            // cout<<inclinationZ<<endl;
 
+            yawFromEKF = FromQuaternionToEulerAngles(globqat);
+            
 
-            roll = atan2(inclinationY,inclinationZ)*(180.0/3.14159265358979323846);
-            pitch = atan2(-inclinationX,sqrt(pow(inclinationY,2)+pow(inclinationZ,2)))*(180.0/3.14159265358979323846);
+            RPY.roll = atan2(inclinationY,inclinationZ)*(180.0/PI);
+            RPY.pitch = atan2(-inclinationX,sqrt(pow(inclinationY,2)+pow(inclinationZ,2)))*(180.0/PI);
+            RPY.yaw = YawFromEKF.yaw;
 
+            q = FromRPYToQuaternion(RPY);
 
-    	    cout<<"roll: "<<roll<<endl;
-            cout<<"pitch: "<<pitch<<endl;
+    	    cout<<"roll: "<<RPY.roll<<endl;
+            cout<<"pitch: "<<RPY.pitch<<endl;
+            cout<<"yaw_from_ekf"<< RPY.yaw<<endl;
+
             //myDriverRevG.printInfo();
              
             stim300msg.orientation_covariance[0] = -1;
