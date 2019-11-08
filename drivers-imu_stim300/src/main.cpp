@@ -180,7 +180,7 @@ int main(int argc , char **argv)
         //inclinometer data
         sensor_msgs::Imu orientationStim300msg;
         orientationStim300msg.header.stamp = ros::Time::now();
-        orientationStim300msg.header.frame_id = "odom";
+        orientationStim300msg.header.frame_id = "imu_0";
 
         //inclinometer data
         sensor_msgs::Imu stim300msg;
@@ -226,8 +226,8 @@ int main(int argc , char **argv)
             yawFromEKF = FromQuaternionToEulerAngles(globqat);
             
 
-            RPY.roll = atan2(inclinationY,inclinationZ)*(180.0/PI);
-            RPY.pitch = atan2(-inclinationX,sqrt(pow(inclinationY,2)+pow(inclinationZ,2)))*(180.0/PI);
+            RPY.roll = atan2(inclinationY,inclinationZ);
+            RPY.pitch = atan2(-inclinationX,sqrt(pow(inclinationY,2)+pow(inclinationZ,2)));
             RPY.yaw = yawFromEKF.yaw;
 
             q = FromRPYToQuaternion(RPY);
