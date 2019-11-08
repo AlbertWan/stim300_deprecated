@@ -229,7 +229,7 @@ int main(int argc , char **argv)
 
     	    cout<<"roll: "<<RPY.roll<<endl;
             cout<<"pitch: "<<RPY.pitch<<endl;
-            cout<<"yaw_from_ekf"<< RPY.yaw<<endl;
+            cout<<"yaw_from_ekf: "<< RPY.yaw<<endl;
 
             //myDriverRevG.printInfo();
             stim300msg.orientation_covariance[0] = 0.2; 
