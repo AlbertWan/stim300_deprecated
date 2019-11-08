@@ -254,9 +254,10 @@ int main(int argc , char **argv)
             stim300msg.angular_velocity.y = myDriverRevG.getGyroData()[1];
             stim300msg.angular_velocity.z = myDriverRevG.getGyroData()[2];
 
-            stim300msg.orientation.x = 0;
-            stim300msg.orientation.y = 0;
-            stim300msg.orientation.z = 0;
+            stim300msg.orientation.x = q.x;
+            stim300msg.orientation.y = q.y;
+            stim300msg.orientation.z = q.z;
+            stim300msg.orientation.w = q.w;
 
             imuSensorPublisher.publish(stim300msg);
             ++countMessages;
