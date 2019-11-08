@@ -166,8 +166,9 @@ int main(int argc , char **argv)
     // Inclinometer -- 
 
     ros::Subscriber EKFsubscriber = node.subscribe("quat/ekf",1000,quatFromEkfCallback);
-
+    ros::Publisher orientationPublisher = node.advertise<sensor_msgs::Imu>("imu/orientation", 1000);
     // inclinometer  -- 
+
     ros::Publisher imuSensorPublisher = node.advertise<sensor_msgs::Imu>("imu/data_raw", 1000);
     ros::Rate loop_rate(sampleRate+1);
 
@@ -176,8 +177,12 @@ int main(int argc , char **argv)
 
     ROS_INFO("Publishing sensor data from IMU");
     while(ros::ok()){
-        
-        
+        //inclinometer data
+        sensor_msgs::Imu orientationStim300msg;
+        orientationStim300msg.header.stamp = ros::Time::now();
+        orientationStim300msg.header.frame_id = "odom";
+
+        //inclinometer data
         sensor_msgs::Imu stim300msg;
 
         myDriverRevG.processPacket();
@@ -232,9 +237,15 @@ int main(int argc , char **argv)
             cout<<"yaw_from_ekf: "<< RPY.yaw<<endl;
 
             //myDriverRevG.printInfo();
-            stim300msg.orientation_covariance[0] = 0.2; 
-            stim300msg.orientation_covariance[4] = 0.2;
-            stim300msg.orientation_covariance[8] = 0.2;
+            orientationStim300msg.orientation_covariance[0] = 0.2;
+            orientationStim300msg.orientation_covariance[4] = 0.2;
+            orientationStim300msg.orientation_covariance[8] = 0.2;
+
+            orientationStim300msg.orientation.w = q.w;
+            orientationStim300msg.orientation.x = q.x;
+            orientationStim300msg.orientation.y = q.y;
+            orientationStim300msg.orientation.z = q.z;
+
             stim300msg.angular_velocity_covariance[0] = varianceOfGyro;
             stim300msg.angular_velocity_covariance[4] = varianceOfGyro;
             stim300msg.angular_velocity_covariance[8] = varianceOfGyro;                                  
@@ -254,11 +265,8 @@ int main(int argc , char **argv)
             stim300msg.angular_velocity.y = myDriverRevG.getGyroData()[1];
             stim300msg.angular_velocity.z = myDriverRevG.getGyroData()[2];
 
-            stim300msg.orientation.x = q.x;
-            stim300msg.orientation.y = q.y;
-            stim300msg.orientation.z = q.z;
-            stim300msg.orientation.w = q.w;
 
+            orientationPublisher.publish(orientationStim300msg);
             imuSensorPublisher.publish(stim300msg);
             ++countMessages;
 
