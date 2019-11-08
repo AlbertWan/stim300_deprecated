@@ -148,8 +148,8 @@ int main(int argc , char **argv)
             pitch = atan2(-inclinationX,sqrt(pow(inclinationY,2)+pow(inclinationZ,2)))*(180.0/3.14159265358979323846);
 
 
-    	    cout<<"roll: "<<roll<<endl;
-            cout<<"pitch: "<<pitch<<endl;
+    	    //cout<<"roll: "<<roll<<endl;
+            //cout<<"pitch: "<<pitch<<endl;
             //myDriverRevG.printInfo();
              
             stim300msg.orientation_covariance[0] = -1;
