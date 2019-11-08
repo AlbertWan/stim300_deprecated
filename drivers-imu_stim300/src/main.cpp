@@ -68,12 +68,12 @@ EulerAngles FromQuaternionToEulerAngles(Quaternion q) {
 Quaternion FromRPYToQuaternion(EulerAngles angles) // yaw (Z), pitch (Y), roll (X)
 {
     // Abbreviations for the various angular functions
-    double cy = cos(yaw * 0.5);
-    double sy = sin(yaw * 0.5);
-    double cp = cos(pitch * 0.5);
-    double sp = sin(pitch * 0.5);
-    double cr = cos(roll * 0.5);
-    double sr = sin(roll * 0.5);
+    double cy = cos(angles.yaw * 0.5);
+    double sy = sin(angles.yaw * 0.5);
+    double cp = cos(angles.pitch * 0.5);
+    double sp = sin(angles.pitch * 0.5);
+    double cr = cos(angles.roll * 0.5);
+    double sr = sin(angles.roll * 0.5);
 
     Quaternion q;
     q.w = cy * cp * cr + sy * sp * sr;
