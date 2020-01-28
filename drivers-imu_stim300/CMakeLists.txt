@@ -17,6 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  std_srvs
   sensor_msgs
   message_generation
 )
@@ -80,6 +81,7 @@ generate_messages(
     DEPENDENCIES
     std_msgs
     sensor_msgs	
+    std_srvs
 )
 
 ################################################
@@ -116,7 +118,7 @@ generate_messages(
 catkin_package(
    INCLUDE_DIRS include
 #  LIBRARIES STIM300RosDriver
-   CATKIN_DEPENDS roscpp rospy message_runtime std_msgs sensor_msgs
+   CATKIN_DEPENDS roscpp rospy message_runtime std_msgs sensor_msgs std_srvs
    DEPENDS eigen system_lib 
 )
 
