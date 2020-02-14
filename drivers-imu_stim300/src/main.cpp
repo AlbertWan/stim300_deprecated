@@ -244,21 +244,13 @@ int main(int argc , char **argv)
             EulerAngles RPY;
             EulerAngles yawFromEKF;
 
-            
-
-
             // Get inclination data and convert to roll and pitch
 
             inclinationX = myDriverRevG.getInclData()[0];
             inclinationY = myDriverRevG.getInclData()[1];
             inclinationZ = myDriverRevG.getInclData()[2];
 
-           // cout<<inclinationX<<endl;
-           // cout<<inclinationY<<endl;
-           // cout<<inclinationZ<<endl;
-
             //yawFromEKF = FromQuaternionToEulerAngles(globqat);
-            
 
             RPY.roll = atan2(inclinationY,inclinationZ);
             RPY.pitch = atan2(-inclinationX,sqrt(pow(inclinationY,2)+pow(inclinationZ,2)));
@@ -266,11 +258,45 @@ int main(int argc , char **argv)
 
             q = FromRPYToQuaternion(RPY);
 
-    	    
-            cout<<"yaw_from_ekf: "<< RPY.yaw<<endl;
+            orientationStim300msg.orientation_covariance[0] = 0.2;
+            orientationStim300msg.orientation_covariance[4] = 0.2;
+            orientationStim300msg.orientation_covariance[8] = 0.2;
 
+            //orientationStim300msg.orientation.w = q.w;
+            //orientationStim300msg.orientation.x = q.x;
+            //orientationStim300msg.orientation.y = q.y;
+            //orientationStim300msg.orientation.z = q.z;
+
+            stim300msg.angular_velocity_covariance[0] = varianceOfGyro;
+            stim300msg.angular_velocity_covariance[4] = varianceOfGyro;
+            stim300msg.angular_velocity_covariance[8] = varianceOfGyro;                                  
+            stim300msg.linear_acceleration_covariance[0] = varianceOfAcc;
+            stim300msg.linear_acceleration_covariance[4] = varianceOfAcc;
+            stim300msg.linear_acceleration_covariance[8] = varianceOfAcc;
+
+
+                //
+                // Place sensor data from IMU to message
+
+            stim300msg.linear_acceleration.x = myDriverRevG.getAccData()[0];
+            stim300msg.linear_acceleration.y = myDriverRevG.getAccData()[1];
+            stim300msg.linear_acceleration.z = myDriverRevG.getAccData()[2];
+
+            stim300msg.angular_velocity.x = myDriverRevG.getGyroData()[0];
+            stim300msg.angular_velocity.y = myDriverRevG.getGyroData()[1];
+            stim300msg.angular_velocity.z = myDriverRevG.getGyroData()[2];
+
+
+            orientationPublisher.publish(orientationStim300msg);
+            imuSensorPublisher.publish(stim300msg);
+            ++countMessages;
+
+    	    
+            //cout<<"yaw_from_ekf: "<< RPY.yaw<<endl;
+            /*
             if (calibrationMode == true)
             {
+                
                 if(numberOfSamples < NUMBEROFCALIBRATIONSAMPLES)
                 {
                     
@@ -298,43 +324,12 @@ int main(int argc , char **argv)
             else 
             {
                 
-                orientationStim300msg.orientation_covariance[0] = 0.2;
-                orientationStim300msg.orientation_covariance[4] = 0.2;
-                orientationStim300msg.orientation_covariance[8] = 0.2;
-
-                orientationStim300msg.orientation.w = q.w;
-                orientationStim300msg.orientation.x = q.x;
-                orientationStim300msg.orientation.y = q.y;
-                orientationStim300msg.orientation.z = q.z;
-
-                stim300msg.angular_velocity_covariance[0] = varianceOfGyro;
-                stim300msg.angular_velocity_covariance[4] = varianceOfGyro;
-                stim300msg.angular_velocity_covariance[8] = varianceOfGyro;                                  
-                stim300msg.linear_acceleration_covariance[0] = varianceOfAcc;
-                stim300msg.linear_acceleration_covariance[4] = varianceOfAcc;
-                stim300msg.linear_acceleration_covariance[8] = varianceOfAcc;
-
-
-                //
-                // Place sensor data from IMU to message
-
-                stim300msg.linear_acceleration.x = myDriverRevG.getAccData()[0];
-                stim300msg.linear_acceleration.y = myDriverRevG.getAccData()[1];
-                stim300msg.linear_acceleration.z = myDriverRevG.getAccData()[2];
-
-                stim300msg.angular_velocity.x = myDriverRevG.getGyroData()[0];
-                stim300msg.angular_velocity.y = myDriverRevG.getGyroData()[1];
-                stim300msg.angular_velocity.z = myDriverRevG.getGyroData()[2];
-
-
-                orientationPublisher.publish(orientationStim300msg);
-                imuSensorPublisher.publish(stim300msg);
-                ++countMessages;
+               
 
             }
 
             //myDriverRevG.printInfo();
-            
+            */
 
         }
 
