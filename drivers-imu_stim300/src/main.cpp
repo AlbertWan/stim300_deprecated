@@ -258,6 +258,38 @@ int main(int argc , char **argv)
 
             q = FromRPYToQuaternion(RPY);
 
+            //cout<<"yaw_from_ekf: "<< RPY.yaw<<endl;
+            
+            if (calibrationMode == true)
+            {
+                
+                if(numberOfSamples < NUMBEROFCALIBRATIONSAMPLES)
+                {
+                    
+                    inclinationXCalibrationSum += inclinationX;
+                    inclinationYCalibrationSum += inclinationY;
+                    inclinationZCalibrationSum += inclinationZ;
+
+                }
+                else
+                {
+                    
+                    inclinationXAverage = inclinationXCalibrationSum/NUMBEROFCALIBRATIONSAMPLES;
+                    inclinationYAverage = inclinationYCalibrationSum/NUMBEROFCALIBRATIONSAMPLES;
+                    inclinationZAverage = inclinationZCalibrationSum/NUMBEROFCALIBRATIONSAMPLES;
+
+                    averageCalibrationRoll = atan2(inclinationYAverage,inclinationZAverage);
+                    averageCalibrationPitch = atan2(-inclinationXAverage,sqrt(pow(inclinationYAverage,2)+pow(inclinationZAverage,2)));
+                    
+                    ROS_INFO("roll: %f", averageCalibrationRoll);
+                    ROS_INFO("pitch: %f", averageCalibrationPitch);
+                    ROS_INFO("IMU Calibrated");
+                    calibrationMode = false;
+                }  
+            }
+            else 
+            {
+
             orientationStim300msg.orientation_covariance[0] = 0.2;
             orientationStim300msg.orientation_covariance[4] = 0.2;
             orientationStim300msg.orientation_covariance[8] = 0.2;
@@ -290,53 +322,16 @@ int main(int argc , char **argv)
             orientationPublisher.publish(orientationStim300msg);
             imuSensorPublisher.publish(stim300msg);
             ++countMessages;
-
-    	    
-            //cout<<"yaw_from_ekf: "<< RPY.yaw<<endl;
-            /*
-            if (calibrationMode == true)
-            {
                 
-                if(numberOfSamples < NUMBEROFCALIBRATIONSAMPLES)
-                {
-                    
-                    inclinationXCalibrationSum += inclinationX;
-                    inclinationYCalibrationSum += inclinationY;
-                    inclinationZCalibrationSum += inclinationZ;
-
-                }
-                else
-                {
-                    
-                    inclinationXAverage = inclinationXCalibrationSum/NUMBEROFCALIBRATIONSAMPLES;
-                    inclinationYAverage = inclinationYCalibrationSum/NUMBEROFCALIBRATIONSAMPLES;
-                    inclinationZAverage = inclinationZCalibrationSum/NUMBEROFCALIBRATIONSAMPLES;
-
-                    averageCalibrationRoll = atan2(inclinationYAverage,inclinationZAverage);
-                    averageCalibrationPitch = atan2(-inclinationXAverage,sqrt(pow(inclinationYAverage,2)+pow(inclinationZAverage,2)));
-                    
-                    ROS_INFO("roll: %f", averageCalibrationRoll);
-                    ROS_INFO("pitch: %f", averageCalibrationPitch);
-                    ROS_INFO("IMU Calibrated");
-                    calibrationMode = false;
-                }  
-            }
-            else 
-            {
-                
-               
-
             }
 
             //myDriverRevG.printInfo();
-            */
 
         }
 
         loop_rate.sleep();
 
         ros::spinOnce();
-
     }
 
 
