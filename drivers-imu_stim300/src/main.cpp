@@ -9,10 +9,6 @@
 #include <Stim300RevG.hpp>
 #include <Eigen/Geometry> 
 
-
-
-
-
 // For ROS to work properly 
 
 #include "sensor_msgs/Imu.h"
@@ -23,12 +19,11 @@
 
 
 
+//////////////
+
+
+
 using namespace std;
-
-
-
-
-
 
 
 ///////////////
@@ -36,9 +31,7 @@ constexpr int defaultSampleRate{125}; // In hz
 constexpr double averageAllanVarianceOfGyro{0.0001*2*4.6*pow(10,-4)};
 constexpr double averageAllanVarianceOfAcc{100*2*5.2*pow(10,-3)};
 constexpr double PI{3.14159265358979323846};
-constexpr int NUMBEROFCALIBRATIONSAMPLES{1000};
 bool calibrationMode{false};
-
 
 
 
@@ -127,7 +120,6 @@ bool responseCalibrateIMU(std_srvs::Trigger::Request &calibration_request, std_s
 
 int main(int argc , char **argv)
 {
-    
    
 	imu_stim300::Stim300RevG myDriverRevG;
 
@@ -194,19 +186,8 @@ int main(int argc , char **argv)
     ros::Publisher imuSensorPublisher = node.advertise<sensor_msgs::Imu>("imu/data_raw", 1000);
     ros::Rate loop_rate(sampleRate+1);
 
-    ros::ServiceServer service = node.advertiseService("IMU_calibration",responseCalibrateIMU);
-
     int differenceInDataGram{0};
     int countMessages{0};
-    int numberOfSamples{0};
-    double averageCalibrationRoll{0};
-    double averageCalibrationPitch{0};
-    double inclinationXCalibrationSum{0};
-    double inclinationYCalibrationSum{0};
-    double inclinationZCalibrationSum{0};
-    double inclinationXAverage{0};
-    double inclinationYAverage{0};
-    double inclinationZAverage{0};
 
     ROS_INFO("Publishing sensor data from IMU");
     while(ros::ok()){
@@ -235,7 +216,6 @@ int main(int argc , char **argv)
         }
         else
         {  
-
             
             double inclinationX{0};
             double inclinationY{0};
@@ -244,17 +224,25 @@ int main(int argc , char **argv)
             EulerAngles RPY;
             EulerAngles yawFromEKF;
 
+            
+
+
             // Get inclination data and convert to roll and pitch
 
             inclinationX = myDriverRevG.getInclData()[0];
             inclinationY = myDriverRevG.getInclData()[1];
             inclinationZ = myDriverRevG.getInclData()[2];
 
-            //yawFromEKF = FromQuaternionToEulerAngles(globqat);
+           // cout<<inclinationX<<endl;
+           // cout<<inclinationY<<endl;
+           // cout<<inclinationZ<<endl;
+
+            yawFromEKF = FromQuaternionToEulerAngles(globqat);
+            
 
             RPY.roll = atan2(inclinationY,inclinationZ);
             RPY.pitch = atan2(-inclinationX,sqrt(pow(inclinationY,2)+pow(inclinationZ,2)));
-            //RPY.yaw = yawFromEKF.yaw;
+            RPY.yaw = yawFromEKF.yaw;
 
             q = FromRPYToQuaternion(RPY);
 
@@ -294,10 +282,10 @@ int main(int argc , char **argv)
             orientationStim300msg.orientation_covariance[4] = 0.2;
             orientationStim300msg.orientation_covariance[8] = 0.2;
 
-            //orientationStim300msg.orientation.w = q.w;
-            //orientationStim300msg.orientation.x = q.x;
-            //orientationStim300msg.orientation.y = q.y;
-            //orientationStim300msg.orientation.z = q.z;
+            orientationStim300msg.orientation.w = q.w;
+            orientationStim300msg.orientation.x = q.x;
+            orientationStim300msg.orientation.y = q.y;
+            orientationStim300msg.orientation.z = q.z;
 
             stim300msg.angular_velocity_covariance[0] = varianceOfGyro;
             stim300msg.angular_velocity_covariance[4] = varianceOfGyro;
@@ -307,8 +295,8 @@ int main(int argc , char **argv)
             stim300msg.linear_acceleration_covariance[8] = varianceOfAcc;
 
 
-                //
-                // Place sensor data from IMU to message
+            //
+            // Place sensor data from IMU to message
 
             stim300msg.linear_acceleration.x = myDriverRevG.getAccData()[0];
             stim300msg.linear_acceleration.y = myDriverRevG.getAccData()[1];
